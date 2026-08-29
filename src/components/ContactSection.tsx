@@ -57,31 +57,31 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ initialProjectTy
     setErrorMessage('');
 
     try {
-      // Send via Web3Forms endpoint directly to mdmahfuzollah@gmail.com
+      const formData = new FormData();
+      formData.append('access_key', 'ce0a3ca4-cf82-40b7-9afa-dd60e01732d9');
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('subject', `[Portfolio Inquiry] ${projectType} from ${name}`);
+      formData.append('project_type', projectType);
+      formData.append('budget', budget);
+      formData.append('message', message);
+      formData.append('from_name', 'Mahfuzollah Portfolio');
+
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: 'ce0a3ca4-cf82-40b7-9afa-dd60e01732d9',
-          from_name: name,
-          email: email,
-          subject: `[Portfolio Inquiry] ${projectType} from ${name}`,
-          project_type: projectType,
-          budget: budget,
-          message: message,
-        })
+        body: formData
       });
 
       const result = await response.json();
-      if (result.success || response.ok) {
+      if (result.success) {
         setStatus('success');
       } else {
+        console.warn('Web3Forms response:', result);
+        // Still transition to success/confirmation state with mailto option
         setStatus('success');
       }
-    } catch {
+    } catch (err) {
+      console.error('Submission error:', err);
       setStatus('success');
     }
   };
